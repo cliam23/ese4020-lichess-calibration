@@ -1,0 +1,7 @@
+data/raw/
+__pycache__/
+*.pyc
+.DS_Store
+parse.log
+run_parse.sh
+push_to_github.sh

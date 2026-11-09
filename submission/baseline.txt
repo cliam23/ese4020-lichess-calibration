@@ -1,0 +1,40 @@
+# Lichess Rating Calibration against the Elo Formula
+
+## Group
+LXP Group: Xinran, Pedro, Liam
+
+## Changes since the proposal
+- Baseline adds the two-parameter logistic fit E[S | d] = 1/(1 + exp(-(β0 + β1·d))) to Elo and the floor. Draws enter as S = 1/2 (a win and a loss, weight 1/2 each).
+- CV folds are contiguous blocks of days, since players recur within a day.
+- Added the rating-noise check (player game counts kept in memory; usernames still discarded).
+- Spline, mean rating and interactions moved to step two. We keep UTCDate and drop games dated outside the month.
+
+## Data
+January 2015: 1,497,237 games. Removed, in order: correspondence 5,458; abandoned 11,708; missing rating 0; dated 31 December 2014 1,238. N = 1,478,833 (bullet 405,362; blitz 639,890; classical 433,581).
+February 2015: 1,495,553 games; removed 6,498, 10,187, 1, 1,998; N = 1,476,869.
+Inputs: d = WhiteElo - BlackElo; time control. Output: White's score S (January mean 0.519; 3.7% draws).
+
+## Split
+Select on January; test on February. 5 folds of contiguous January days (1-7, 8-13, 14-19, 20-25, 26-31); d standardized inside each training fold; seed 4020. No choice uses February; it scores the pre-specified baselines once. Extended models: chosen by January CV, scored on February once, at the end.
+
+## Baseline
+Logistic regression, maximum likelihood (Section 3C); CV loss is the fold-size-weighted average (4A). Grid: {pooled β0, β1; separate β0, β1 per time control} × ridge penalty on slopes λ in {0, 1e-6, ..., 1e-1}. CV chose separate β0, β1 per time control; λ = 0. Penalties never helped at this N; by-time-control beat pooled by only 0.00001 ± 0.00001 log-loss (paired over folds), practically a tie.
+
+## Result
+February log-loss: Elo 0.6265 [0.6256, 0.6274]; floor 0.6924 [0.6924, 0.6925]; fit 0.6220 [0.6213, 0.6227]. Fit minus Elo -0.0045 [-0.0047, -0.0043]. Brier: Elo 0.2089, fit 0.2076. January CV: 0.61945 ± 0.00043 (naive fold SE).
+Intervals: 95% percentile, day-level bootstrap, B = 2000.
+On January: β1 = 0.00450 [0.00448, 0.00452], 0.78 times Elo's 0.00576, so the formula is overconfident. White's advantage β0/β1 = 14.8 [14.1, 15.7] rating points; 13.4 bullet, 15.8 blitz, 14.9 classical. Differences clear their intervals but span 2.5 points: practically small.
+
+## Issues found
+- Rating noise explains only some of the low slope: β1 rises to 0.80, 0.81, 0.82 times Elo when both players have at least 10, 30, 100 January games (96%, 89%, 67% of games), then levels off.
+- Players recur heavily (median game's player: about 300 January games), so we resample days, not games.
+- The fit misses by 0.01 to 0.02 in score beyond |d| = 400; hence the spline.
+- 101 kept games ended by "Rules infraction".
+
+## Next steps
+- Xinran: filter table, exploratory plots, key figure with bootstrap bands.
+- Pedro: calibration curves by time control and rating band; infraction sensitivity.
+- Liam: extended models (mean rating, interactions, spline in d) under the same CV; β0/β1 by rating band.
+
+## Code
+https://github.com/cliam23/ese4020-lichess-calibration

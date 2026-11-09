@@ -1,0 +1,24 @@
+{
+  "month": "2015-01",
+  "games_in_file": 1497237,
+  "removed_in_order": {
+    "correspondence": 5458,
+    "abandoned": 11708,
+    "missing_rating": 0,
+    "unfinished_result": 0,
+    "wrong_month_or_bad_date": 1238
+  },
+  "kept": 1478833,
+  "players": 40396,
+  "tc_from_clock_fallback": 0,
+  "kept_by_termination": {
+    "Normal": 995659,
+    "Time forfeit": 483073,
+    "Rules infraction": 101
+  },
+  "kept_by_tc": {
+    "classical": 433581,
+    "bullet": 405362,
+    "blitz": 639890
+  }
+}
