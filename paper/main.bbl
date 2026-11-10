@@ -1,0 +1,133 @@
+\begin{thebibliography}{19}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Bates et~al.(2024)Bates, Hastie, and Tibshirani]{bates2024}
+Stephen Bates, Trevor Hastie, and Robert Tibshirani.
+\newblock Cross-validation: What does it estimate and how well does it do it?
+\newblock \emph{Journal of the American Statistical Association}, 119\penalty0
+  (546):\penalty0 1434--1445, 2024.
+
+\bibitem[Bradley and Terry(1952)]{bradley1952}
+Ralph~Allan Bradley and Milton~E. Terry.
+\newblock Rank analysis of incomplete block designs: {I}. the method of paired
+  comparisons.
+\newblock \emph{Biometrika}, 39\penalty0 (3/4):\penalty0 324--345, 1952.
+
+\bibitem[Brier(1950)]{brier1950}
+Glenn~W. Brier.
+\newblock Verification of forecasts expressed in terms of probability.
+\newblock \emph{Monthly Weather Review}, 78\penalty0 (1):\penalty0 1--3, 1950.
+
+\bibitem[Carroll et~al.(2006)Carroll, Ruppert, Stefanski, and
+  Crainiceanu]{carroll2006}
+Raymond~J. Carroll, David Ruppert, Leonard~A. Stefanski, and Ciprian~M.
+  Crainiceanu.
+\newblock \emph{Measurement Error in Nonlinear Models: A Modern Perspective}.
+\newblock Chapman \& Hall/CRC, 2nd edition, 2006.
+\newblock \doi{10.1201/9781420010138}.
+
+\bibitem[Efron and Tibshirani(1993)]{efron1993}
+Bradley Efron and Robert~J. Tibshirani.
+\newblock \emph{An Introduction to the Bootstrap}.
+\newblock Chapman \& Hall, 1993.
+
+\bibitem[Elo(1978)]{elo1978}
+Arpad~E. Elo.
+\newblock \emph{The Rating of Chessplayers, Past and Present}.
+\newblock Arco, New York, 1978.
+
+\bibitem[Friedman(2001)]{friedman2001}
+Jerome~H. Friedman.
+\newblock Greedy function approximation: A gradient boosting machine.
+\newblock \emph{The Annals of Statistics}, 29\penalty0 (5):\penalty0
+  1189--1232, 2001.
+
+\bibitem[Glickman(1999)]{glickman1999}
+Mark~E. Glickman.
+\newblock Parameter estimation in large dynamic paired comparison experiments.
+\newblock \emph{Journal of the Royal Statistical Society: Series C (Applied
+  Statistics)}, 48\penalty0 (3):\penalty0 377--394, 1999.
+\newblock \doi{10.1111/1467-9876.00159}.
+
+\bibitem[Glickman(2001)]{glickman2001}
+Mark~E. Glickman.
+\newblock Dynamic paired comparison models with stochastic variances.
+\newblock \emph{Journal of Applied Statistics}, 28\penalty0 (6):\penalty0
+  673--689, 2001.
+\newblock \doi{10.1080/02664760120059219}.
+
+\bibitem[Gneiting and Raftery(2007)]{gneiting2007}
+Tilmann Gneiting and Adrian~E. Raftery.
+\newblock Strictly proper scoring rules, prediction, and estimation.
+\newblock \emph{Journal of the American Statistical Association}, 102\penalty0
+  (477):\penalty0 359--378, 2007.
+
+\bibitem[Guo et~al.(2017)Guo, Pleiss, Sun, and Weinberger]{guo2017}
+Chuan Guo, Geoff Pleiss, Yu~Sun, and Kilian~Q. Weinberger.
+\newblock On calibration of modern neural networks.
+\newblock In \emph{Proceedings of the 34th International Conference on Machine
+  Learning}, volume~70 of \emph{PMLR}, pages 1321--1330, 2017.
+
+\bibitem[Hastie et~al.(2009)Hastie, Tibshirani, and Friedman]{hastie2009}
+Trevor Hastie, Robert Tibshirani, and Jerome Friedman.
+\newblock \emph{The Elements of Statistical Learning: Data Mining, Inference,
+  and Prediction}.
+\newblock Springer, 2nd edition, 2009.
+
+\bibitem[Ke et~al.(2017)Ke, Meng, Finley, Wang, Chen, Ma, Ye, and Liu]{ke2017}
+Guolin Ke, Qi~Meng, Thomas Finley, Taifeng Wang, Wei Chen, Weidong Ma, Qiwei
+  Ye, and Tie-Yan Liu.
+\newblock {LightGBM}: A highly efficient gradient boosting decision tree.
+\newblock In \emph{Advances in Neural Information Processing Systems},
+  volume~30, 2017.
+
+\bibitem[{Lichess}(2015)]{lichessdb}
+{Lichess}.
+\newblock Lichess open database: Standard rated games, {January} and {February}
+  2015.
+\newblock \url{https://database.lichess.org/}, released under CC0 1.0, 2015.
+\newblock Accessed 9 November 2026.
+
+\bibitem[{Lichess}(2026)]{lichessfaq}
+{Lichess}.
+\newblock Frequently asked questions: Lichess ratings.
+\newblock \url{https://lichess.org/faq}, 2026.
+\newblock Accessed 9 November 2026.
+
+\bibitem[Pedregosa et~al.(2011)Pedregosa, Varoquaux, Gramfort, Michel, Thirion,
+  Grisel, Blondel, Prettenhofer, Weiss, Dubourg, Vanderplas, Passos,
+  Cournapeau, Brucher, Perrot, and Duchesnay]{pedregosa2011}
+Fabian Pedregosa, Ga{\"e}l Varoquaux, Alexandre Gramfort, Vincent Michel,
+  Bertrand Thirion, Olivier Grisel, Mathieu Blondel, Peter Prettenhofer, Ron
+  Weiss, Vincent Dubourg, Jake Vanderplas, Alexandre Passos, David Cournapeau,
+  Matthieu Brucher, Matthieu Perrot, and {\'E}douard Duchesnay.
+\newblock Scikit-learn: Machine learning in {P}ython.
+\newblock \emph{Journal of Machine Learning Research}, 12:\penalty0 2825--2830,
+  2011.
+
+\bibitem[Regan and Haworth(2011)]{regan2011}
+Kenneth~W. Regan and Guy~McC. Haworth.
+\newblock Intrinsic chess ratings.
+\newblock In \emph{Proceedings of the Twenty-Fifth AAAI Conference on
+  Artificial Intelligence}, pages 834--839, 2011.
+\newblock \doi{10.1609/aaai.v25i1.7951}.
+
+\bibitem[Sonas(2002)]{sonas2002}
+Jeff Sonas.
+\newblock The {Sonas} rating formula -- better than {Elo}?
+\newblock ChessBase News,
+  \url{https://en.chessbase.com/post/the-sonas-rating-formula-better-than-elo},
+  October 2002.
+
+\bibitem[Sonas(2011)]{sonas2011}
+Jeff Sonas.
+\newblock The {Elo} rating system -- correcting the expectancy tables.
+\newblock ChessBase News,
+  \url{https://en.chessbase.com/post/the-elo-rating-system-correcting-the-expectancy-tables},
+  March 2011.
+
+\end{thebibliography}

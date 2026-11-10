@@ -1,0 +1,58 @@
+\begin{table}[h]
+\centering\small
+\caption{January 5-fold day-blocked CV for every configuration: fold-size-weighted log-loss, its naive SE, and the paired difference from the baseline in units of $10^{-4}$ ($\pm$ SE of the paired fold differences). Selected models in bold.}
+\label{tab:cv}
+\begin{tabular}{lccc}
+\toprule
+Configuration & CV log-loss & naive SE & $\Delta$ vs.\ baseline \\
+\midrule
+\textbf{Logit, + spline in d (df 12)} & 0.61927 & 0.00044 & -1.79 $\pm$ 0.18 \\
+Logit, + spline in d (df 10) & 0.61927 & 0.00044 & -1.77 $\pm$ 0.19 \\
+Logit, + spline in d (df 8) & 0.61928 & 0.00044 & -1.73 $\pm$ 0.19 \\
+Logit, + spline in d (df 12), $\lambda$=1e-05 & 0.61928 & 0.00044 & -1.72 $\pm$ 0.18 \\
+Logit, + spline in d (df 10), $\lambda$=1e-05 & 0.61928 & 0.00044 & -1.71 $\pm$ 0.18 \\
+Logit, + spline in d (df 8), $\lambda$=1e-05 & 0.61928 & 0.00044 & -1.68 $\pm$ 0.17 \\
+Logit, + spline in d (df 6) & 0.61929 & 0.00044 & -1.65 $\pm$ 0.17 \\
+Logit, + spline in d (df 12), $\lambda$=0.0001 & 0.61929 & 0.00044 & -1.59 $\pm$ 0.14 \\
+Logit, + spline in d (df 10), $\lambda$=0.0001 & 0.61929 & 0.00044 & -1.56 $\pm$ 0.14 \\
+Logit, + spline in d (df 6), $\lambda$=1e-05 & 0.61930 & 0.00044 & -1.55 $\pm$ 0.14 \\
+Logit, + spline in d (df 8), $\lambda$=0.0001 & 0.61930 & 0.00044 & -1.51 $\pm$ 0.13 \\
+Logit, + spline in d (df 6), $\lambda$=0.0001 & 0.61931 & 0.00044 & -1.42 $\pm$ 0.13 \\
+Logit, + spline in d (df 4), $\lambda$=1e-05 & 0.61932 & 0.00044 & -1.35 $\pm$ 0.14 \\
+Logit, + spline in d (df 4) & 0.61932 & 0.00044 & -1.35 $\pm$ 0.14 \\
+Logit, + spline in d (df 4), $\lambda$=0.0001 & 0.61932 & 0.00044 & -1.34 $\pm$ 0.14 \\
+Logit, + spline in d (df 12), $\lambda$=0.001 & 0.61933 & 0.00044 & -1.22 $\pm$ 0.12 \\
+Logit, + spline in d (df 10), $\lambda$=0.001 & 0.61933 & 0.00044 & -1.21 $\pm$ 0.12 \\
+Logit, + spline in d (df 8), $\lambda$=0.001 & 0.61933 & 0.00044 & -1.20 $\pm$ 0.12 \\
+Logit, + spline in d (df 6), $\lambda$=0.001 & 0.61933 & 0.00044 & -1.17 $\pm$ 0.13 \\
+Logit, + spline in d (df 4), $\lambda$=0.001 & 0.61934 & 0.00044 & -1.09 $\pm$ 0.14 \\
+Logit, + mean rating, $\lambda$=1e-05 & 0.61942 & 0.00043 & -0.26 $\pm$ 0.08 \\
+Logit, + mean rating & 0.61942 & 0.00043 & -0.26 $\pm$ 0.08 \\
+Logit, + mean rating, $\lambda$=0.0001 & 0.61943 & 0.00043 & -0.25 $\pm$ 0.09 \\
+Logit, + mean rating, $\lambda$=0.001 & 0.61945 & 0.00044 & -0.01 $\pm$ 0.14 \\
+Logit, d by time control (baseline) & 0.61945 & 0.00043 & +0.00 $\pm$ 0.00 \\
+Logit, d (pooled) & 0.61946 & 0.00044 & +0.11 $\pm$ 0.13 \\
+\midrule
+\textbf{Gradient boosting (100 trees, 127 leaves, rate 0.05)} & 0.61913 & 0.00044 & -3.22 $\pm$ 0.31 \\
+Gradient boosting (100 trees, 63 leaves, rate 0.05) & 0.61913 & 0.00045 & -3.18 $\pm$ 0.32 \\
+Gradient boosting (50 trees, 63 leaves, rate 0.1) & 0.61914 & 0.00045 & -3.12 $\pm$ 0.32 \\
+Gradient boosting (50 trees, 127 leaves, rate 0.1) & 0.61914 & 0.00044 & -3.10 $\pm$ 0.31 \\
+Gradient boosting (50 trees, 255 leaves, rate 0.1) & 0.61916 & 0.00045 & -2.88 $\pm$ 0.29 \\
+Gradient boosting (100 trees, 63 leaves, rate 0.1) & 0.61923 & 0.00045 & -2.20 $\pm$ 0.25 \\
+Gradient boosting (100 trees, 15 leaves, rate 0.1) & 0.61925 & 0.00045 & -1.97 $\pm$ 0.24 \\
+Gradient boosting (50 trees, 15 leaves, rate 0.1) & 0.61926 & 0.00044 & -1.89 $\pm$ 0.31 \\
+Gradient boosting (150 trees, 15 leaves, rate 0.1) & 0.61928 & 0.00045 & -1.68 $\pm$ 0.24 \\
+Gradient boosting (100 trees, 7 leaves, rate 0.1) & 0.61929 & 0.00045 & -1.62 $\pm$ 0.28 \\
+Gradient boosting (150 trees, 7 leaves, rate 0.1) & 0.61929 & 0.00045 & -1.58 $\pm$ 0.25 \\
+Gradient boosting (150 trees, 63 leaves, rate 0.1) & 0.61933 & 0.00044 & -1.17 $\pm$ 0.23 \\
+Gradient boosting (400 trees, 7 leaves, rate 0.1) & 0.61934 & 0.00045 & -1.06 $\pm$ 0.23 \\
+Gradient boosting (50 trees, 7 leaves, rate 0.1) & 0.61935 & 0.00045 & -1.04 $\pm$ 0.37 \\
+Gradient boosting (400 trees, 15 leaves, rate 0.1) & 0.61941 & 0.00044 & -0.36 $\pm$ 0.23 \\
+Gradient boosting (25 trees, 255 leaves, rate 0.1) & 0.61961 & 0.00044 & +1.59 $\pm$ 0.60 \\
+Gradient boosting (25 trees, 127 leaves, rate 0.1) & 0.61966 & 0.00044 & +2.10 $\pm$ 0.57 \\
+Gradient boosting (50 trees, 127 leaves, rate 0.05) & 0.61972 & 0.00045 & +2.72 $\pm$ 0.58 \\
+Gradient boosting (400 trees, 63 leaves, rate 0.1) & 0.61979 & 0.00044 & +3.43 $\pm$ 0.24 \\
+Gradient boosting (50 trees, 63 leaves, rate 0.05) & 0.61981 & 0.00044 & +3.63 $\pm$ 0.59 \\
+\bottomrule
+\end{tabular}
+\end{table}

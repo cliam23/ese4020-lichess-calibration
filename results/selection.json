@@ -1,0 +1,32 @@
+{
+  "logit": {
+    "family": "logit",
+    "config": 22,
+    "level": 4.0,
+    "df": 12.0,
+    "lam": 0.0,
+    "max_iter": NaN,
+    "max_leaf_nodes": NaN,
+    "learning_rate": NaN,
+    "cv_logloss": 0.6192712279514708,
+    "naive_se": 0.0004430850168156909,
+    "minus_baseline": -0.00017912397343930388,
+    "minus_baseline_se": 1.8106936811394927e-05,
+    "label": "Logit: + spline in d (df 12)"
+  },
+  "gbm": {
+    "family": "gbm",
+    "config": 19,
+    "level": NaN,
+    "df": NaN,
+    "lam": NaN,
+    "max_iter": 100.0,
+    "max_leaf_nodes": 127.0,
+    "learning_rate": 0.05,
+    "cv_logloss": 0.6191285674446506,
+    "naive_se": 0.00044439600500051623,
+    "minus_baseline": -0.0003217844802595972,
+    "minus_baseline_se": 3.114027942064118e-05,
+    "label": "Gradient boosting (100 trees, 127 leaves, rate 0.05)"
+  }
+}

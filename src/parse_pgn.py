@@ -81,6 +81,37 @@ def games(stream):
         yield hdr
 
 
+def prev_day_means(rows):
+    """Each player's mean displayed rating over their games on EARLIER days.
+
+    Uses only games before the current day, so it never contains the
+    current game's result.  Returns, per game, (white_prev_mean,
+    white_prev_n, black_prev_mean, black_prev_n); means are '' when the
+    player has no earlier-day games.
+    """
+    import numpy as np
+    import pandas as pd
+    day = np.array([r[0] for r in rows])
+    long = pd.DataFrame({
+        "pid": np.r_[[r[6] for r in rows], [r[7] for r in rows]],
+        "day": np.r_[day, day],
+        "elo": np.r_[[r[2] for r in rows], [r[3] for r in rows]]})
+    pd_ = (long.groupby(["pid", "day"]).elo.agg(["sum", "count"])
+               .reset_index().sort_values(["pid", "day"]))
+    g = pd_.groupby("pid")
+    pd_["prev_sum"] = g["sum"].cumsum() - pd_["sum"]
+    pd_["prev_n"] = g["count"].cumsum() - pd_["count"]
+    key = dict(zip(zip(pd_.pid, pd_.day), zip(pd_.prev_sum, pd_.prev_n)))
+    out = []
+    for r in rows:
+        vals = []
+        for pid in (r[6], r[7]):
+            s, n = key[(pid, r[0])]
+            vals += [round(s / n, 1) if n else "", int(n)]
+        out.append(tuple(vals))
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--month", required=True, help="e.g. 2015-01")
@@ -129,15 +160,18 @@ def main():
     for r in rows:
         counts[r[6]] += 1
         counts[r[7]] += 1
+    prev = prev_day_means(rows)
     del ids  # usernames never leave memory
 
     path = os.path.join(args.out, f"games_{args.month}.csv.gz")
     with gzip.open(path, "wt", newline="") as f:
         wr = csv.writer(f)
         wr.writerow(["day", "tc", "white_elo", "black_elo", "score",
-                     "termination", "n_white", "n_black"])
-        for r in rows:
-            wr.writerow(r[:6] + (counts[r[6]], counts[r[7]]))
+                     "termination", "n_white", "n_black",
+                     "white_prev_mean", "white_prev_n",
+                     "black_prev_mean", "black_prev_n"])
+        for r, pv in zip(rows, prev):
+            wr.writerow(r[:6] + (counts[r[6]], counts[r[7]]) + pv)
 
     summary = {
         "month": args.month,

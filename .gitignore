@@ -1,7 +1,14 @@
-data/raw/
-__pycache__/
 *.pyc
 .DS_Store
+__pycache__/
+data/raw/
+paper/*.aux
+paper/*.blg
+paper/*.fdb_latexmk
+paper/*.fls
+paper/*.log
+paper/*.out
+paper/build.log
 parse.log
+results/*.log
 run_parse.sh
-push_to_github.sh
