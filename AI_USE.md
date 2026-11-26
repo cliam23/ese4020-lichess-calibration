@@ -20,3 +20,15 @@ tools were used and for what. The acknowledgements in `paper/main.tex` summarize
 - **Still to do by the group.** Each member reads the code for their part; one teammate reruns
   `./run_all.sh` from scratch and compares `results/summary.md` and `paper/numbers.tex`; each
   member opens every reference; every member can explain every equation and figure.
+
+- **26 November 2026 (final-paper version).** AI was used for guidance; project direction, design, verification and
+  decisions were made by the team. Claude reimplemented the pipeline in `final/` (from the early-draft PDF
+  and then compared with this repository), added the player-level bootstrap, the March 2015 test month (declared
+  in `final/results/declaration.md` before it was downloaded), the extended simulations, the ordinal-logit and
+  rating-change checks, and revised the paper text. It verified new references against Crossref, arXiv and the Lichess
+  source code. A headline number (February log-loss of the baseline) was recomputed independently with scikit-learn
+  and matches to ten digits; a tampered selection file is refused by `score.py`.
+- **Still to do by the group.** Each member reads the new code for their part; one teammate runs `final/run_all.sh`
+  from scratch and compares `final/paper/numbers.tex`; each member opens every new reference
+  (Bradley and Terry 1952; Berkson 1950; Owen 2007; Cameron, Gelbach and Miller 2011; Gneiting and Raftery 2007;
+  Guo et al. 2017; Hvattum and Arntzen 2010).

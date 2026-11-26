@@ -1,0 +1,282 @@
+{
+ "frozen": {
+  "baseline": "bytc",
+  "rating": {
+   "lam": 1e-05
+  },
+  "spline": {
+   "K": 10,
+   "lam": 0.0
+  },
+  "boost": {
+   "trees": 100,
+   "leaves": 63,
+   "lr": 0.05
+  },
+  "chosen_names": {
+   "rating": "rating|lam=1e-05",
+   "spline": "spline|K=10|lam=0",
+   "boost": "boost|trees=100|leaves=63|lr=0.05"
+  },
+  "sha256": "d2174c8655bfa2e88384a45dd417055326c2d436d236b5c9a7b8c4e7b36426f1",
+  "frozen_utc": "2026-11-26T18:50:51Z"
+ },
+ "train_steps": {
+  "raw": 1497237,
+  "not_bullet_blitz_classical": 5458,
+  "label_vs_duration_mismatch": 0,
+  "abandoned": 11708,
+  "missing_rating": 0,
+  "bad_result": 0,
+  "outside_month": 1238,
+  "final": 1478833
+ },
+ "ordinal_params": {
+  "Bullet": [
+   -0.12988414184640884,
+   0.005994592647065089,
+   1.8523404717239298
+  ],
+  "Blitz": [
+   -0.16053757288758128,
+   0.019002569147292536,
+   1.7914434808719704
+  ],
+  "Classical": [
+   -0.16255376025997884,
+   0.030024515091500392,
+   1.7722719055781646
+  ]
+ },
+ "n_params": {
+  "floor": 1,
+  "elo": 0,
+  "pooled": 2,
+  "bytc": 6,
+  "rating": 9,
+  "spline": 17,
+  "boost": null,
+  "ordinal": 9
+ },
+ "months": {
+  "2015-02": {
+   "steps": {
+    "raw": 1495553,
+    "not_bullet_blitz_classical": 6498,
+    "label_vs_duration_mismatch": 0,
+    "abandoned": 10187,
+    "missing_rating": 1,
+    "bad_result": 0,
+    "outside_month": 1998,
+    "final": 1476869
+   },
+   "summary": {
+    "n": 1476869,
+    "n_days": 28,
+    "n_players": 40645,
+    "white_score": 0.5187064661794648,
+    "draw_rate": 0.037390587790792545,
+    "abs_gap_median": 104.0,
+    "rating_mean": 1618.4619915510448,
+    "rating_sd": 249.5533753946512,
+    "gap_sd": 200.01695625014395,
+    "gap_mean": 4.362472230103008,
+    "n_infraction": 114,
+    "n_time_forfeit": 475421,
+    "by_class": {
+     "Bullet": 391126,
+     "Blitz": 649835,
+     "Classical": 435908
+    }
+   },
+   "metrics": {
+    "floor": {
+     "logloss": 0.6924473325114223,
+     "brier": 0.24030250838981398,
+     "calib": null
+    },
+    "elo": {
+     "logloss": 0.6264986395539007,
+     "brier": 0.20886357685240503,
+     "calib": 0.03035000429966827
+    },
+    "pooled": {
+     "logloss": 0.6220342896788378,
+     "brier": 0.2076091412662963,
+     "calib": 0.003259953028585
+    },
+    "bytc": {
+     "logloss": 0.6220013907692086,
+     "brier": 0.20759676666686228,
+     "calib": 0.0034049153474014966
+    },
+    "rating": {
+     "logloss": 0.6219743213529578,
+     "brier": 0.20758897503031434,
+     "calib": 0.003347042120251519
+    },
+    "spline": {
+     "logloss": 0.6218092414440494,
+     "brier": 0.2075658920454836,
+     "calib": 0.0017029903657815608
+    },
+    "boost": {
+     "logloss": 0.6216882143708716,
+     "brier": 0.207519857630779,
+     "calib": 0.0017085477369023553
+    },
+    "ordinal": {
+     "logloss": 0.6220032571556685,
+     "brier": 0.20759636044089225,
+     "calib": 0.0033279079911885862
+    }
+   }
+  },
+  "2015-03": {
+   "steps": {
+    "raw": 1742733,
+    "not_bullet_blitz_classical": 7589,
+    "label_vs_duration_mismatch": 0,
+    "abandoned": 10828,
+    "missing_rating": 1,
+    "bad_result": 0,
+    "outside_month": 2146,
+    "final": 1722169
+   },
+   "summary": {
+    "n": 1722169,
+    "n_days": 31,
+    "n_players": 46405,
+    "white_score": 0.5186207044720931,
+    "draw_rate": 0.03708521056876532,
+    "abs_gap_median": 105.0,
+    "rating_mean": 1611.7403489436867,
+    "rating_sd": 246.99933415482357,
+    "gap_sd": 198.5849772995207,
+    "gap_mean": 3.864947052234711,
+    "n_infraction": 90,
+    "n_time_forfeit": 553623,
+    "by_class": {
+     "Bullet": 444254,
+     "Blitz": 771423,
+     "Classical": 506492
+    }
+   },
+   "metrics": {
+    "floor": {
+     "logloss": 0.6924538483543375,
+     "brier": 0.2403821090544105,
+     "calib": null
+    },
+    "elo": {
+     "logloss": 0.6256719794888654,
+     "brier": 0.20855935135302675,
+     "calib": 0.029667939209230474
+    },
+    "pooled": {
+     "logloss": 0.6213303709820052,
+     "brier": 0.20733625784540446,
+     "calib": 0.0034333691316573256
+    },
+    "bytc": {
+     "logloss": 0.6212893684640426,
+     "brier": 0.20732323116361556,
+     "calib": 0.003585520939548649
+    },
+    "rating": {
+     "logloss": 0.6212688927330875,
+     "brier": 0.20732013500788052,
+     "calib": 0.003574015079053444
+    },
+    "spline": {
+     "logloss": 0.6210966112719216,
+     "brier": 0.2072902679406469,
+     "calib": 0.0007041166603352665
+    },
+    "boost": {
+     "logloss": 0.6209651627677202,
+     "brier": 0.20724159527638905,
+     "calib": 0.0010068798751886794
+    },
+    "ordinal": {
+     "logloss": 0.6212901118886852,
+     "brier": 0.20732247481986602,
+     "calib": 0.003509643454140861
+    }
+   }
+  },
+  "2015-03L": {
+   "steps": {
+    "raw": 1742733,
+    "not_bullet_blitz_classical": 7589,
+    "label_vs_duration_mismatch": 0,
+    "abandoned": 10828,
+    "missing_rating": 1,
+    "bad_result": 0,
+    "outside_month": 2146,
+    "final": 1722169
+   },
+   "summary": {
+    "n": 1246893,
+    "n_days": 31,
+    "n_players": 35836,
+    "white_score": 0.5180624961404066,
+    "draw_rate": 0.03557241880417967,
+    "abs_gap_median": 107.0,
+    "rating_mean": 1641.5669668528094,
+    "rating_sd": 249.99362253084456,
+    "gap_sd": 204.54863559164025,
+    "gap_mean": 3.339059566458389,
+    "n_infraction": 31,
+    "n_time_forfeit": 475355,
+    "by_class": {
+     "Bullet": 444254,
+     "Blitz": 771423,
+     "Classical": 31216
+    }
+   },
+   "metrics": {
+    "floor": {
+     "logloss": 0.6924962588649809,
+     "brier": 0.24078150207684085,
+     "calib": null
+    },
+    "elo": {
+     "logloss": 0.6218716895693366,
+     "brier": 0.2072335797887988,
+     "calib": 0.0289201020836825
+    },
+    "pooled": {
+     "logloss": 0.6176236582948986,
+     "brier": 0.2060836694929659,
+     "calib": 0.00462176678435082
+    },
+    "bytc": {
+     "logloss": 0.6175735978438213,
+     "brier": 0.2060657289171631,
+     "calib": 0.004273076813478472
+    },
+    "rating": {
+     "logloss": 0.6175528501471117,
+     "brier": 0.2060640809597806,
+     "calib": 0.004261422804835055
+    },
+    "spline": {
+     "logloss": 0.6173396644372116,
+     "brier": 0.20602681797651853,
+     "calib": 0.0011214882066365047
+    },
+    "boost": {
+     "logloss": 0.6172329129558636,
+     "brier": 0.20598595414258633,
+     "calib": 0.0016021183685242053
+    },
+    "ordinal": {
+     "logloss": 0.6175744097299568,
+     "brier": 0.20606453886209855,
+     "calib": 0.004134551039113558
+    }
+   }
+  }
+ }
+}

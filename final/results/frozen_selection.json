@@ -1,0 +1,22 @@
+{
+ "baseline": "bytc",
+ "rating": {
+  "lam": 1e-05
+ },
+ "spline": {
+  "K": 10,
+  "lam": 0.0
+ },
+ "boost": {
+  "trees": 100,
+  "leaves": 63,
+  "lr": 0.05
+ },
+ "chosen_names": {
+  "rating": "rating|lam=1e-05",
+  "spline": "spline|K=10|lam=0",
+  "boost": "boost|trees=100|leaves=63|lr=0.05"
+ },
+ "sha256": "d2174c8655bfa2e88384a45dd417055326c2d436d236b5c9a7b8c4e7b36426f1",
+ "frozen_utc": "2026-11-26T18:50:51Z"
+}

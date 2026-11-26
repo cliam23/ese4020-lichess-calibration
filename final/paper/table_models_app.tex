@@ -1,0 +1,16 @@
+\begin{tabular}{llcccccc}
+\toprule
+ & & CV paired diff. & \multicolumn{2}{c}{Feb} & \multicolumn{3}{c}{Mar} \\
+\cmidrule(lr){4-5}\cmidrule(lr){6-8}
+Model & Params & vs.\ baseline ($10^{-4}$) & Brier & Calib. & log-loss & Brier & Calib. \\
+\midrule
+Floor (White's mean score) & 1 & 729.68 $\pm$ 4.16 & 0.2403 $\pm$ 0.0003 & -- & 0.6925 $\pm$ 0.0001 & 0.2404 $\pm$ 0.0002 & -- \\
+Elo formula & 0 & 43.48 $\pm$ 0.53 & 0.2089 $\pm$ 0.0013 & 0.0304 & 0.6257 $\pm$ 0.0032 & 0.2086 $\pm$ 0.0013 & 0.0297 \\
+Logistic on $d$, pooled & 2 & 0.10 $\pm$ 0.13 & 0.2076 $\pm$ 0.0013 & 0.0033 & 0.6213 $\pm$ 0.0030 & 0.2073 $\pm$ 0.0013 & 0.0034 \\
+Logistic on $d$ by time control & 6 & -- & 0.2076 $\pm$ 0.0013 & 0.0034 & 0.6213 $\pm$ 0.0030 & 0.2073 $\pm$ 0.0013 & 0.0036 \\
+Rating logistic (adds mean rating) & 9 & $-$0.25 $\pm$ 0.08 & 0.2076 $\pm$ 0.0013 & 0.0033 & 0.6213 $\pm$ 0.0030 & 0.2073 $\pm$ 0.0013 & 0.0036 \\
+Spline logistic & 17 & $-$1.97 $\pm$ 0.19 & 0.2076 $\pm$ 0.0013 & 0.0017 & 0.6211 $\pm$ 0.0030 & 0.2073 $\pm$ 0.0013 & 0.0007 \\
+Boosted trees & -- & $-$3.19 $\pm$ 0.32 & 0.2075 $\pm$ 0.0013 & 0.0017 & 0.6210 $\pm$ 0.0030 & 0.2072 $\pm$ 0.0013 & 0.0010 \\
+Ordinal logit (draws modelled) & 9 & 0.01 $\pm$ 0.00 & 0.2076 $\pm$ 0.0013 & 0.0033 & 0.6213 $\pm$ 0.0030 & 0.2073 $\pm$ 0.0013 & 0.0035 \\
+\bottomrule
+\end{tabular}

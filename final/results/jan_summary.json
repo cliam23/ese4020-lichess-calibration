@@ -1,0 +1,20 @@
+{
+ "n": 1478833,
+ "n_days": 31,
+ "n_players": 40396,
+ "white_score": 0.5189849022844364,
+ "draw_rate": 0.03710087616384,
+ "abs_gap_median": 105.0,
+ "rating_mean": 1624.7303755731716,
+ "rating_sd": 247.56067539981726,
+ "gap_sd": 205.16426041497454,
+ "gap_mean": 4.851489654342309,
+ "n_infraction": 101,
+ "n_time_forfeit": 483073,
+ "by_class": {
+  "Bullet": 405362,
+  "Blitz": 639890,
+  "Classical": 433581
+ },
+ "m_sd": 225.29387707113182
+}
