@@ -18,7 +18,7 @@
 \input{numbers.tex}
 
 \newcommand{\todo}[1]{\textcolor{red}{[#1]}}
-\newcommand{\videourl}{\todo{ADD VIDEO LINK}}
+\newcommand{\videourl}{to be added with the final version}
 \newcommand{\codeurl}{\url{https://github.com/cliam23/ese4020-lichess-calibration}}
 \newcommand{\tenm}{$\times 10^{-4}$}
 
@@ -159,7 +159,7 @@ Applied to displayed Lichess ratings, the Elo formula is overconfident: the fitt
 
 \textbf{AI use.} We used Claude (Anthropic) for guidance: it drafted and debugged code, ran analyses, suggested and checked references, and edited the manuscript, including the additions in this version (player-level bootstrap, March test month, extended simulations). Project direction, design, verification and decisions were made by the team.
 
-\textbf{Contributions.} Xinran Gao: data pipeline review, exploratory analysis and final figures. Pedro S{\'a}nchez-Gil Galindo: Elo baseline, calibration curves and sensitivity analyses. Liam Campbell: extended models, cross-validation, bootstrap and noise analyses. All authors wrote and checked the paper. \todo{Authors: say who reviewed the additions in this version (player-level bootstrap, March, simulation variants, limitations).}
+\textbf{Contributions.} Xinran Gao: data pipeline review, exploratory analysis and final figures. Pedro S{\'a}nchez-Gil Galindo: Elo baseline, calibration curves and sensitivity analyses. Liam Campbell: extended models, cross-validation, bootstrap and noise analyses. All authors wrote and checked the paper. Pedro S{\'a}nchez-Gil Galindo reviewed the additions in this version (player-level bootstrap, March test month, simulation variants, limitations).
 
 \textbf{Data and code.} Data are the Lichess open database (CC0 1.0), headers only. Code and every result file are in the repository on the first page; the final-version pipeline, the March declaration and the frozen selection are in its \texttt{final/} directory, and \texttt{final/run\_all.sh} rebuilds this paper from the raw files.
 
