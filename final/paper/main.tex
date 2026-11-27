@@ -1,0 +1,343 @@
+\documentclass{article}
+
+\usepackage[preprint]{neurips_2026}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{nicefrac}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{graphicx}
+
+\input{numbers.tex}
+
+\newcommand{\todo}[1]{\textcolor{red}{[#1]}}
+\newcommand{\videourl}{to be added with the final version}
+\newcommand{\codeurl}{\url{https://github.com/cliam23/ese4020-lichess-calibration}}
+\newcommand{\tenm}{$\times 10^{-4}$}
+
+\title{Is the Elo Formula Calibrated on Displayed Lichess Ratings?}
+
+\author{%
+  Liam Campbell \\
+  University of Pennsylvania \\
+  \And
+  Xinran Gao \\
+  University of Pennsylvania \\
+  \And
+  Pedro S{\'a}nchez-Gil Galindo \\
+  University of Pennsylvania \\
+  \AND
+  \textbf{Video:} \videourl \\ \textbf{Code:} \codeurl
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Chess sites turn the rating gap between two players into a predicted score with the Elo formula. We ask one question: applied to the ratings Lichess displays, is that formula calibrated, meaning that the slope of White's log-odds of scoring on the rating gap equals Elo's? We train on \nGamesJan{} games from January 2015 and test on February and, as declared in advance, on March. A logistic regression on the gap, our course baseline, lowers held-out log-loss relative to the formula by \dEloBaseFebAbs{}\tenm{} in February (95\% player-level bootstrap interval for the difference [\dEloBaseFebLo{}, \dEloBaseFebHi{}]) and by \dEloBaseMarAbs{}\tenm{} in March; its slope is \SlopeAllJan{} of Elo's (interval [\SlopeAllJanLo{}, \SlopeAllJanHi{}]). Splines and boosted trees add at most \gainPctBoost\% of that gain. So the formula is overconfident on displayed ratings, but we cannot say it is wrong about true strength: a simulation with known truth reproduces the slope with independent rating errors of about \sigmaClass{} points per player, although it would take about \sigmaBerk{} points if displayed ratings are posterior means, as in Glicko-2. White's edge is \EdgePPAllJan{} percentage points of expected score (interval [\EdgePPAllJanLo{}, \EdgePPAllJanHi{}]), similar across time controls.
+\end{abstract}
+
+\section{Introduction}
+
+A rating system makes a testable claim. If two players are rated $R_W$ and $R_B$, the Elo formula \citep{elo1978} says White's expected score is
+\begin{equation}
+  E[S \mid d] = \frac{1}{1 + 10^{-d/400}}, \qquad d = R_W - R_B,
+  \label{eq:elo}
+\end{equation}
+where $S$ is 1 for a White win, $\nicefrac{1}{2}$ for a draw and 0 for a loss. Lichess publishes every rated game with both players' pre-game ratings \citep{lichessdb}. Those ratings come from Glicko-2 \citep{glickman1999,glickman2001}, which also tracks a rating deviation (RD) for each player, and a Glicko expected score shrinks the gap by a factor that depends on the two deviations. The published files contain no deviations. We therefore test the Elo formula applied to displayed ratings, which is what a reader of the ratings would compute, and not Lichess's internal predictor.
+
+We ask: \emph{when applied to displayed Lichess ratings, does the Elo formula have the right slope, so that a fitted logistic slope on the gap equals Elo's, and does a model of White's score do better than the formula on held-out games?} The question matters because the same formula drives matchmaking and rating updates.
+
+One complication shapes the study. A displayed rating is a noisy estimate of strength, and noise in a predictor flattens a fitted slope \citep{carroll2006}. A shallow slope is what an overconfident formula predicts, and also what noisy ratings predict. We therefore keep two claims apart: whether Elo is calibrated as applied to displayed ratings, which we test directly, and whether it is calibrated for true strength, which we can only bound with simulations of known truth.
+
+\section{Related work}
+
+\paragraph{Rating systems.} The Elo formula is the logistic paired-comparison model of \citet{bradley1952} with a fixed scale \citep{elo1978}. Glicko and Glicko-2 add a rating deviation and a volatility \citep{glickman1999,glickman2001}, so the expected score depends on how well each rating is known. \citet{sonas2011} found that in FIDE games a 240-point favourite scores about 76\% where the Elo table says 80\%, a 6:5 ratio in effective rating differences; our slope ratio of \SlopeAllJan{} is the same kind of statement for online play. Rating systems have also been judged as forecasters \citep{hvattum2010}.
+
+\paragraph{Noise in the predictor.} Classical measurement error attenuates regression slopes, while Berkson error, where the truth is the measured value plus noise, does not attenuate a linear slope but does flatten a nonlinear link \citep{berkson1950,carroll2006}. A Glicko rating, a posterior mean, is closer to the Berkson case; we simulate both.
+
+\paragraph{Dependent data.} Games share players, so game-level resampling understates uncertainty. We follow \citet{efron1993} for the bootstrap, \citet{owen2007} for resampling players when each game has two, and \citet{cameron2011} for how much clustering can matter. Cross-validation error bars are also too small when folds are correlated \citep{bates2024}.
+
+\section{Data}
+
+\paragraph{Source and shape.} We use the Lichess open database of standard rated games, \url{https://database.lichess.org/}, released under CC0 1.0 \citep{lichessdb}: January, February and March 2015 (\nRawJan{}, \nRawFeb{} and \nRawMar{} games). We read PGN headers only, never the moves. Each game is one row: event type, UTC date, result, both ratings, time control and termination, from which we derive the target $S$, the gap $d$, the pair's mean rating $\bar R$ and the time class. Usernames are mapped to integers in memory when read, to count each player's games and to resample players; no username is stored, and the integers do not link months.
+
+\paragraph{Cleaning.} In order, we drop correspondence games, abandoned games, games missing a rating and games dated outside the file's month (counts in Appendix~\ref{app:data}). We keep the \nInfrJan{} January games ended by a rules infraction. This leaves \nGamesJan{} January games (\nPlayersJan{} players), \nGamesFeb{} in February (\nDaysFeb{} days) and \nGamesMar{} in March (\nDaysMar{} days). In January the pair's mean rating averages \ratingMean{} (SD \ratingSD), White scores \whiteScore{} and \drawRate\% of games are drawn. In March 2015 Lichess relabelled most of its old ``Classical'' games ``Standard'' (\nStandardMar{} games, the same time controls), so time classes follow estimated duration (initial seconds plus 40 times the increment: bullet under 180\,s, blitz 180--479\,s, classical 480\,s or more), which reproduces every January and February label. We found the relabelling after a first March run that kept only labelled games, and report that run in Appendix~\ref{app:data}.
+
+\paragraph{Split.} We train on January and test on February and on March. The split is temporal. Inside January we form 5 folds, each a contiguous block of days (1--7, 8--13, 14--19, 20--25, 26--31), so no day is on both sides of a fold.
+
+\section{Method}
+
+\paragraph{Course baseline.} Our baseline from the classification module is logistic regression \citep{islr} of $S$ on $d$ with separate coefficients for each time class:
+\begin{equation}
+  \operatorname{logit} E[S \mid d] = \beta_0 + \beta_1 d .
+  \label{eq:logit}
+\end{equation}
+Because $S$ can be $\nicefrac{1}{2}$, we fit it as a fractional-response logit \citep{papke1996}: the Bernoulli likelihood evaluated at $S \in \{0, \nicefrac{1}{2}, 1\}$, so a draw is a half-weight win and a half-weight loss. The Elo formula is the special case $\beta_0 = 0$, $\beta_1 = \ln(10)/400$. We report the slope ratio $\beta_1/(\ln 10/400)$, which is below 1 when the formula is overconfident, and White's advantage in expected score at equal ratings, $\sigma(\beta_0) - \nicefrac{1}{2}$, and in rating points, $\beta_0/\beta_1$. Cross-validation chose the by-time-class baseline over a single pooled pair of coefficients, but the two tie (paired CV difference (\cvPooledDiff{} $\pm$ \cvPooledSE{})\tenm{}), so we report both.
+
+\paragraph{Compared methods.} \emph{Rating logistic} adds $\bar R$, $\bar R^2$ and $d\bar R$ to the baseline. \emph{Spline logistic} adds a natural cubic spline in $d$ \citep{hastie2009} with knots at quantiles of the training gap, with $K \in \{4,6,8,10,12\}$; both carry a ridge penalty $\lambda \in \{0, 10^{-5}, 10^{-4}, 10^{-3}\}$ on standardized inputs. \emph{Boosted trees} \citep{friedman2001,ke2017} use scikit-learn's histogram implementation \citep{pedregosa2011} on $(d, \bar R, \text{time class})$, monotone increasing in $d$, with 20 settings drawn from trees $\{50,100,200\}$, leaves $\{31,63,127\}$ and learning rate $\{0.03, 0.05, 0.1, 0.2\}$. \emph{Ordinal logit} models loss, draw and win with the baseline's linear predictor and separate thresholds, and is scored on its expected score. Reference points are the Elo formula and a floor that predicts White's mean training score.
+
+\paragraph{Rating-noise checks (January).} (i) \emph{Frequent players}: refit~\eqref{eq:logit} on games where both players have many games in the month, whose ratings should be better settled. (ii) \emph{Smoothed ratings}: for a game on day $t$, average each player's displayed ratings over their games on days $1,\dots,t-1$. This uses only the past, so it cannot contain the game's result. If displayed ratings were exact, the smoothed gap would add nothing once $d$ is in the model. As a proxy for how settled a player is we also use the mean absolute rating change over those earlier games; we do not use the current game's rating change, because it depends on the result. (iii) \emph{Simulation with known truth.} Outcomes follow~\eqref{eq:elo} exactly in true strength $T$ (White's true edge set to the observed \simTrueEdgePts{} rating points), and we ask which noise level $\sigma$ per player reproduces the observed slope. \emph{Classical error (headline):} the displayed rating is true strength plus independent $N(0,\sigma^2)$ noise, so the displayed gap is $T + N(0, 2\sigma^2)$. To make the simulated displayed gap keep January's mean and variance (\gapSD{} points SD) at every $\sigma$, true gaps are January's observed gaps rescaled about their mean by $\sqrt{\lambda}$, $\lambda = 1 - 2\sigma^2/\mathrm{Var}(d)$; the shape of the simulated gap is then a smoothed version of January's. \emph{Classical, exact gap:} the displayed gap is January's observed gap exactly and $T$ is drawn from its Gaussian posterior. \emph{Berkson error:} true strength is the displayed rating plus $N(0,\sigma^2)$ per player, $T = d + N(0, 2\sigma^2)$. The implied $\sigma$ depends on the construction (Appendix~\ref{app:sim}); each $\sigma$ uses 20 seeds.
+
+\section{Experimental setup}
+
+\paragraph{Metric.} The primary metric is log-loss on the expected score, $-[S\log p+(1-S)\log(1-p)]$, averaged over games; with the Brier score it is a strictly proper scoring rule \citep{gneiting2007}. We also report a calibration error \citep{guo2017}: the game-weighted mean of $|\text{observed} - \text{predicted}|$ over 50-point bins of $d$ with at least 200 games.
+
+\paragraph{Validation and frozen selection.} Hyperparameters are chosen by the fold-size-weighted validation log-loss over the 5 folds of January; everything learned from data (spline knots, standardization, penalties, tree bins) is fitted on the training folds only. The selection script never opens a test month; it writes the chosen settings (Table~\ref{tab:models}) with a SHA-256 hash (\selectionHash\dots, \selectionTime), and the scoring script refuses to run if the hash fails. We scored February in an earlier draft, so it is not untouched; March is. Before downloading March we wrote down that it would be the second test month and that conclusions would count as stable if (1) the baseline beats Elo with a player-level interval excluding zero, (2) the ordering of Elo, baseline, spline and boosting on log-loss matches February, and (3) the slope fitted on March lies within 0.03 of January's.
+
+\paragraph{Error bars.} CV fold standard errors are too small because fold scores are correlated \citep{bates2024}, so we compare models by paired fold differences and by the test bootstrap. Test intervals are 95\% percentile intervals from three schemes, 2000 resamples each: \emph{game} (independent Poisson(1) weights), \emph{day} (whole UTC days resampled), and \emph{player}, the pigeonhole bootstrap \citep{owen2007}, which gives each player an independent Poisson(1) weight and each game the product of its two players' weights. The player scheme is conservative; it is our headline and every $\pm$ below is half the width of that interval unless stated. Model differences use the same resamples, so intervals account for pairing. Coefficient intervals refit~\eqref{eq:logit} on 1000 resamples.
+
+\section{Results}
+
+\begin{table}[t]
+  \centering
+  \caption{Model comparison. CV is the fold-size-weighted log-loss over 5 day-blocked folds of January. Test columns are on February and March; $\pm$ is half the width of the 95\% player-level bootstrap interval (2000 resamples). $\Delta$ is the paired difference in log-loss in units of $10^{-4}$, so negative values are better than the reference. Tuned settings: baseline by time class; rating logistic $\lambda = \bestLam$; spline $K=\bestKnots$ knots, $\lambda = \splineLam$; boosting \boostTrees{} trees, \boostLeaves{} leaves, learning rate \boostLr.}
+  \label{tab:models}
+  \scriptsize
+  \resizebox{\textwidth}{!}{\input{table_models.tex}}
+\end{table}
+
+\paragraph{The Elo formula is overconfident on displayed ratings.} The baseline's February log-loss is \llBaseFeb{} against \llEloFeb{} for the Elo formula (Table~\ref{tab:models}). The paired difference is \dEloBaseFeb\tenm{} (interval [\dEloBaseFebLo{}, \dEloBaseFebHi{}]\tenm{}), about ten times its half-width from zero, and in March it is \dEloBaseMar\tenm{} ([\dEloBaseMarLo{}, \dEloBaseMarHi{}]). January cross-validation gives the same ordering. The gain is small next to the \floorGap\tenm{} by which Elo beats the floor: ratings carry most of the information. The fitted slope is \SlopeAllJan{} of Elo's (interval [\SlopeAllJanLo{}, \SlopeAllJanHi{}], Table~\ref{tab:advantage}). When White is the 200-point favourite the formula predicts \eloPlus{} and the fitted model \fitPlus{}; when Black is, the formula gives White \eloMinus{} and the fitted model \fitMinus{}. Figure~\ref{fig:calibration} shows the pattern: from about 75 points upward, the underdog outscores the formula in every bin and every time class, by up to \maxResid{} points per game. The calibration error falls from \calibEloFeb{} to \calibBaseFeb{}.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{fig_calibration.pdf}
+  \caption{Where the Elo formula misses. Points show the observed February score minus the Elo prediction in 50-point bins of the rating gap, by time class, with 95\% player-level bootstrap intervals; bins with fewer than 200 games are omitted. The dashed line is the Elo formula itself; the solid line is the pooled logistic baseline fitted on January.}
+  \label{fig:calibration}
+\end{figure}
+
+\paragraph{Flexible models add little.} Against the baseline, the spline gains \dBaseSplineFebAbs{}\tenm{} (interval [\dBaseSplineFebLo{}, \dBaseSplineFebHi{}]) and boosted trees \dBaseBoostFebAbs{}\tenm{} ([\dBaseBoostFebLo{}, \dBaseBoostFebHi{}]). Both intervals exclude zero, and the paired fold differences in January point the same way ((\cvSplineDiff{} $\pm$ \cvSplineSE{}) and (\cvBoostDiff{} $\pm$ \cvBoostSE{})\tenm{}), but they are \gainRatioSpline{} and \gainRatioBoost{} times smaller than the baseline's gain over Elo. The rating logistic gains \dBaseRatingFebAbs{}\tenm{} (interval [\dBaseRatingFebLo{}, \dBaseRatingFebHi{}]), which just reaches zero. The ordinal logit, which models draws explicitly, matches the baseline to four decimals (difference \dBaseOrdinalFeb{}\tenm{}), so treating draws as half-points does not matter. The spline's gain is concentrated in the tails: \gainBigSpline\% of it comes from the \bigGapShare\% of games with $|d| > 400$.
+
+\paragraph{A second test month.} The conditions declared before March was read are all met. The baseline beats Elo by \dEloBaseMarAbs{}\tenm{} with an interval that excludes zero; the ordering of models on log-loss is \orderSame{} as in February; and the slope fitted on March is \SlopeAllMar{} (interval [\SlopeAllMarLo{}, \SlopeAllMarHi{}]), against \SlopeAllJan{} in January.
+
+\begin{table}[t]
+  \centering
+  \caption{Baseline coefficients by time class, fitted on January; slope ratios are also fitted separately on February and March. White's edge is shown in expected-score points (pp) and in rating points. $\pm$ is half the width of the 95\% player-level interval. }
+  \label{tab:advantage}
+  \scriptsize
+  \resizebox{\textwidth}{!}{\input{table_advantage.tex}}
+\end{table}
+
+\paragraph{White's advantage.} Pooled over time classes, White's expected score at equal ratings is \EdgePPAllJan{} percentage points above $\nicefrac{1}{2}$ (interval [\EdgePPAllJanLo{}, \EdgePPAllJanHi{}]), or \EdgePtsAllJan{} rating points. By time class the edge is \EdgePPBulletJan{}, \EdgePPBlitzJan{} and \EdgePPClassicalJan{} points for bullet, blitz and classical (Table~\ref{tab:advantage}). The intervals overlap heavily. The largest difference, blitz minus bullet, is \conBlitzBullet{} points; its player-level interval is [\conBlitzBulletLo{}, \conBlitzBulletHi{}], and only the day-level interval ([\conBlitzBulletDayLo{}, \conBlitzBulletDayHi{}]) excludes zero, barely. Across five bands of mean rating the edge stays between \bandEdgeMin{} and \bandEdgeMax{} points, and the top band minus the bottom band is \bandEdgeContrast{} ([\bandEdgeLo{}, \bandEdgeHi{}]). Differences between time classes of up to about 0.6 points are therefore not excluded, so ``similar'' is the most we can claim. The slope, by contrast, is highest above 1900 (\SlopeBandE{}) and the top band exceeds the bottom band by \bandContrast{} ([\bandContrastLo{}, \bandContrastHi{}]; Appendix~\ref{app:bands}).
+
+\begin{table}[t]
+  \centering
+  \caption{Rating-noise checks on January: the slope ratio $\beta_1/(\ln 10/400)$ of the pooled baseline on subsets of games, with 95\% player-level intervals. ``Settled'' is measured by the mean absolute rating change over a player's games on earlier days; thirds are of the larger of the two players' values.}
+  \label{tab:noise}
+  \small
+  \input{table_noise.tex}
+\end{table}
+
+\paragraph{Is the shallow slope rating noise?} The checks of Section~4 point the same way (Table~\ref{tab:noise}). (i) Requiring both players to have at least 10, 30 or 100 January games (\shareFreqTen, \shareFreqThirty{} and \shareFreqHundred\% of games) raises the slope only to \slopeFreqTen, \slopeFreqThirty{} and \slopeFreqHundred{}. (ii) On the \histShare\% of games where both players have at least 20 earlier-day games, the smoothed gap alone has a lower slope than the displayed gap (\slopeSmooth{} against \slopeDisp), as a lagging average should; together both carry weight (\slopeBothD{} and \slopeBothS), and the combined slope is \slopeBothSum{} (interval [\slopeBothSumLo{}, \slopeBothSumHi{}]). The past holds information about strength that the displayed rating lacks, as noisy ratings imply, but the slope stays below 1. More settled players have steeper slopes (\slopeTercA{} for the most settled third, \slopeTercC{} for the least; difference \tercContrast{}, interval [\tercContrastLo{}, \tercContrastHi{}]), again as noise predicts, yet even the most settled third is well below 1. (iii) Under classical error, about \sigmaClass{} rating points per player (interval \sigmaClassLo--\sigmaClassHi{}, from the interval of the observed slope) reproduce the slope (Figure~\ref{fig:noise}); with January's exact gap distribution it takes \sigmaPost{}, and under Berkson error \sigmaBerk{}. A comment in current Lichess source says the inactivity decay is chosen so that a typical player's RD goes from 60 to 110 in a year \citep{lila}; Berkson noise of that size flattens the slope only to \simBerkSlopeOneTen{}--\simBerkSlopeSixty{}. So the data are consistent with a correct formula for true strength if displayed ratings carry classical errors of about 56 points, near the low end of that RD range, whereas Berkson noise of typical Glicko size would explain only part of the slope; we cannot tell which structure applies. Classical noise inflates White's edge in rating points far more than in score points (Appendix~\ref{app:sim}), so we lead with score units.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{fig_noise.pdf}
+  \caption{Simulation with known truth. Fitted slope divided by the Elo slope when outcomes follow the Elo formula exactly in true strength and displayed ratings carry noise of standard deviation $\sigma$ per player. Lines are means over 20 seeds with min--max bands. Circles mark where each model meets the observed slope (dashed line, with its 95\% player-level interval in grey). The shaded region is the 60--110 range of typical RD named in current Lichess code.}
+  \label{fig:noise}
+\end{figure}
+
+\paragraph{Error bars and dependence.} Day-level intervals are only \dayOverGameMin--\dayOverGameMax{} times wider than game-level ones, but player-level intervals are \ratioMin--\ratioMax{} times wider than day-level ones (\ratioDelta{} for the baseline's gain over Elo, \ratioSlope{} for the slope, \ratioEdge{} for White's edge; Table~\ref{tab:boot}, Appendix~\ref{app:boot}), so most dependence runs through players, not days. No headline conclusion changes: each difference we call real exceeds its player-level interval, and those we call ties do not.
+
+\section{Limitations}
+
+\textbf{Displayed ratings only.} The public files contain no rating deviations, so we cannot compute Glicko-2's own expected score, which shrinks the gap by a factor that depends on both deviations; our claim is about the Elo formula applied to displayed ratings. \textbf{The noise story is bounded, not identified.} The simulation assumes Gaussian noise of equal size for every player and a fixed White edge; the two classical constructions differ (\sigmaClass{} against \sigmaPost{} points), and classical and Berkson error differ by almost a factor of three. The 60--110 RD range comes from 2026 source code, not 2015 settings. \textbf{Provisional players.} Dropping games with a rating of exactly 1500, the default for new accounts, raises the slope to \SlopeNoFifteen{}; the history proxy for how settled a player is also depends on opponents. \textbf{Dependence and scope.} The pigeonhole bootstrap is conservative but ignores clustering by tournament and time of day; a month has only 28--31 days. We use three months of 2015 and make no claim about today's Lichess. \textbf{Process.} February was scored in our early draft, so only March is untouched; the robustness checks and the three noise constructions were chosen after seeing January and February, and the time-class rule after a first March run. \textbf{Causes.} We show that Elo is overconfident on displayed ratings and that noise could explain it; we do not show that it does.
+
+\section{Conclusion}
+
+Applied to displayed Lichess ratings, the Elo formula is overconfident: the fitted slope is \SlopeAllJan{} of Elo's (interval [\SlopeAllJanLo{}, \SlopeAllJanHi{}]), and \SlopeAllFeb{} and \SlopeAllMar{} in the two test months. A two-parameter logistic fit beats the formula by \dEloBaseFebAbs{}\tenm{} of log-loss in February and \dEloBaseMarAbs{}\tenm{} in March; splines, boosted trees and an ordinal model add at most \gainPctBoost\% more. Whether the formula is wrong about true strength is open: classical rating errors of about \sigmaClass{} points would produce the slope with no miscalibration, Berkson errors of Glicko size would explain only part of it, and the deviations needed to decide are not in the public files. White's edge is \EdgePPAllJan{} points of expected score across time controls.
+
+\section*{Acknowledgements and statements}
+
+\textbf{AI use.} We used Claude (Anthropic) for guidance: it drafted and debugged code, ran analyses, suggested and checked references, and edited the manuscript, including the additions in this version (player-level bootstrap, March test month, extended simulations). Project direction, design, verification and decisions were made by the team.
+
+\textbf{Contributions.} Xinran Gao: data pipeline review, exploratory analysis and final figures. Pedro S{\'a}nchez-Gil Galindo: Elo baseline, calibration curves and sensitivity analyses. Liam Campbell: extended models, cross-validation, bootstrap and noise analyses. All authors wrote and checked the paper. Pedro S{\'a}nchez-Gil Galindo reviewed the additions in this version (player-level bootstrap, March test month, simulation variants, limitations).
+
+\textbf{Data and code.} Data are the Lichess open database (CC0 1.0), headers only. Code and every result file are in the repository on the first page; the final-version pipeline, the March declaration and the frozen selection are in its \texttt{final/} directory, and \texttt{final/run\_all.sh} rebuilds this paper from the raw files.
+
+\begin{thebibliography}{99}
+
+\bibitem[Bates et~al.(2024)]{bates2024}
+S.~Bates, T.~Hastie, and R.~Tibshirani.
+\newblock Cross-validation: What does it estimate and how well does it do it?
+\newblock \emph{Journal of the American Statistical Association}, 119(546):1434--1445, 2024.
+
+\bibitem[Berkson(1950)]{berkson1950}
+J.~Berkson.
+\newblock Are there two regressions?
+\newblock \emph{Journal of the American Statistical Association}, 45(250):164--180, 1950.
+
+\bibitem[Bradley and Terry(1952)]{bradley1952}
+R.~A. Bradley and M.~E. Terry.
+\newblock Rank analysis of incomplete block designs: I. The method of paired comparisons.
+\newblock \emph{Biometrika}, 39(3/4):324--345, 1952.
+
+\bibitem[Cameron et~al.(2011)]{cameron2011}
+A.~C. Cameron, J.~B. Gelbach, and D.~L. Miller.
+\newblock Robust inference with multiway clustering.
+\newblock \emph{Journal of Business \& Economic Statistics}, 29(2):238--249, 2011.
+
+\bibitem[Carroll et~al.(2006)]{carroll2006}
+R.~J. Carroll, D.~Ruppert, L.~A. Stefanski, and C.~M. Crainiceanu.
+\newblock \emph{Measurement Error in Nonlinear Models: A Modern Perspective}.
+\newblock Chapman \& Hall/CRC, 2nd edition, 2006. doi: 10.1201/9781420010138.
+
+\bibitem[Efron and Tibshirani(1993)]{efron1993}
+B.~Efron and R.~J. Tibshirani.
+\newblock \emph{An Introduction to the Bootstrap}.
+\newblock Chapman \& Hall, 1993.
+
+\bibitem[Elo(1978)]{elo1978}
+A.~E. Elo.
+\newblock \emph{The Rating of Chessplayers, Past and Present}.
+\newblock Arco, New York, 1978.
+
+\bibitem[Friedman(2001)]{friedman2001}
+J.~H. Friedman.
+\newblock Greedy function approximation: A gradient boosting machine.
+\newblock \emph{The Annals of Statistics}, 29(5):1189--1232, 2001.
+
+\bibitem[Glickman(1999)]{glickman1999}
+M.~E. Glickman.
+\newblock Parameter estimation in large dynamic paired comparison experiments.
+\newblock \emph{Journal of the Royal Statistical Society: Series C (Applied Statistics)}, 48(3):377--394, 1999.
+
+\bibitem[Glickman(2001)]{glickman2001}
+M.~E. Glickman.
+\newblock Dynamic paired comparison models with stochastic variances.
+\newblock \emph{Journal of Applied Statistics}, 28(6):673--689, 2001.
+
+\bibitem[Gneiting and Raftery(2007)]{gneiting2007}
+T.~Gneiting and A.~E. Raftery.
+\newblock Strictly proper scoring rules, prediction, and estimation.
+\newblock \emph{Journal of the American Statistical Association}, 102(477):359--378, 2007.
+
+\bibitem[Guo et~al.(2017)]{guo2017}
+C.~Guo, G.~Pleiss, Y.~Sun, and K.~Q. Weinberger.
+\newblock On calibration of modern neural networks.
+\newblock In \emph{Proceedings of the 34th International Conference on Machine Learning}, volume~70 of \emph{PMLR}, 2017. arXiv:1706.04599.
+
+\bibitem[Hastie et~al.(2009)]{hastie2009}
+T.~Hastie, R.~Tibshirani, and J.~Friedman.
+\newblock \emph{The Elements of Statistical Learning}.
+\newblock Springer, 2nd edition, 2009.
+
+\bibitem[Hvattum and Arntzen(2010)]{hvattum2010}
+L.~M. Hvattum and H.~Arntzen.
+\newblock Using {ELO} ratings for match result prediction in association football.
+\newblock \emph{International Journal of Forecasting}, 26(3):460--470, 2010.
+
+\bibitem[James et~al.(2021)]{islr}
+G.~James, D.~Witten, T.~Hastie, and R.~Tibshirani.
+\newblock \emph{An Introduction to Statistical Learning}.
+\newblock Springer, 2nd edition, 2021.
+
+\bibitem[Ke et~al.(2017)]{ke2017}
+G.~Ke, Q.~Meng, T.~Finley, T.~Wang, W.~Chen, W.~Ma, Q.~Ye, and T.-Y. Liu.
+\newblock {LightGBM}: A highly efficient gradient boosting decision tree.
+\newblock In \emph{Advances in Neural Information Processing Systems}, volume~30, 2017.
+
+\bibitem[Lichess(2015)]{lichessdb}
+Lichess.
+\newblock Lichess open database: Standard rated games, January--March 2015.
+\newblock \url{https://database.lichess.org/}, released under CC0 1.0. Accessed 26 November 2026.
+
+\bibitem[Lichess(2026)]{lila}
+Lichess.
+\newblock lila source code, \texttt{modules/rating/src/main/Glicko.scala}.
+\newblock \url{https://github.com/lichess-org/lila}. Accessed 26 November 2026.
+
+\bibitem[Owen(2007)]{owen2007}
+A.~B. Owen.
+\newblock The pigeonhole bootstrap.
+\newblock \emph{The Annals of Applied Statistics}, 1(2):386--411, 2007.
+
+\bibitem[Papke and Wooldridge(1996)]{papke1996}
+L.~E. Papke and J.~M. Wooldridge.
+\newblock Econometric methods for fractional response variables with an application to 401(k) plan participation rates.
+\newblock \emph{Journal of Applied Econometrics}, 11(6):619--632, 1996.
+
+\bibitem[Pedregosa et~al.(2011)]{pedregosa2011}
+F.~Pedregosa, G.~Varoquaux, A.~Gramfort, V.~Michel, B.~Thirion, O.~Grisel, M.~Blondel, P.~Prettenhofer, R.~Weiss, V.~Dubourg, J.~Vanderplas, A.~Passos, D.~Cournapeau, M.~Brucher, M.~Perrot, and \'E.~Duchesnay.
+\newblock Scikit-learn: Machine learning in {Python}.
+\newblock \emph{Journal of Machine Learning Research}, 12:2825--2830, 2011.
+
+\bibitem[Sonas(2011)]{sonas2011}
+J.~Sonas.
+\newblock The Elo rating system -- correcting the expectancy tables.
+\newblock \emph{ChessBase News}, March 2011.
+\newblock \url{https://en.chessbase.com/post/the-elo-rating-system-correcting-the-expectancy-tables}.
+
+\end{thebibliography}
+
+\appendix
+
+\section{Data cleaning and the March relabelling}
+\label{app:data}
+
+\begin{table}[h]
+  \centering
+  \caption{Games removed at each cleaning step, in order.}
+  \small
+  \input{table_cleaning.tex}
+\end{table}
+
+Time classes follow estimated duration; the label-based and duration-based classes agree on every kept game in all three months. Counting only March games labelled bullet, blitz or ``Classical'' (dropping the \nStandardMar{} ``Standard'' games; \nMarLabels{} games remain), the baseline's gain over Elo is \dEloBaseMarLabels\tenm{} (interval [\dEloBaseMarLabelsLo{}, \dEloBaseMarLabelsHi{}]), against \dEloBaseMar\tenm{} for all games.
+
+\section{Further model metrics}
+\label{app:models}
+
+\begin{table}[h]
+  \centering
+  \caption{Paired CV differences against the baseline (mean $\pm$ standard error over 5 folds, units of $10^{-4}$), and Brier score and calibration error on both test months; $\pm$ as in Table~\ref{tab:models}.}
+  \scriptsize
+  \resizebox{\textwidth}{!}{\input{table_models_app.tex}}
+\end{table}
+
+\section{Rating bands and robustness (January)}
+\label{app:bands}
+
+\begin{table}[h]
+  \centering
+  \caption{Course baseline refitted on subsets of January; $\pm$ is half the width of the 95\% player-level interval. Bands are of the pair's mean rating.}
+  \small
+  \resizebox{\textwidth}{!}{\input{table_bands.tex}}
+\end{table}
+
+Dropping the \nInfrJan{} rules-infraction games changes nothing. Dropping games with a rating of exactly 1500, the default for new accounts, raises the slope to \SlopeNoFifteen{}. Dropping time-forfeit games leaves the slope at \SlopeNoForfeit{} but raises White's edge to \EdgePtsNoForfeit{} rating points (\EdgePPNoForfeit{} percentage points), so White's edge is larger in games decided on the board. The two halves of January agree (\SlopeHalfA{} and \SlopeHalfB{}).
+
+\section{Simulation details}
+\label{app:sim}
+
+For each simulated game, $S \sim \text{Bernoulli}(E[S \mid T + a])$ with $E$ the Elo formula, $T$ the true gap and $a$ White's true edge (\simTrueEdgePts{} rating points, the observed pooled edge converted to rating points). Write $\mu$ and $v$ for the mean and variance of January's observed gaps and $\lambda = 1 - 2\sigma^2/v$. \emph{Classical error (headline):} $T = \mu + \sqrt{\lambda}(d - \mu)$ with $d$ drawn from January's observed gaps, and the displayed gap is $T + N(0, 2\sigma^2)$; its variance is $v$ for every $\sigma$ (checked in the simulation), its mean is $\mu$, and its shape is a smoothed version of January's. \emph{Classical, exact gap:} the displayed gap is the observed $d$, and $T \mid d \sim N(\mu + \lambda(d - \mu),\, 2\lambda\sigma^2)$, the exact posterior if $T$ is Gaussian; the displayed gap then has January's exact distribution. \emph{Berkson error:} the displayed gap is the observed $d$ and $T = d + N(0, 2\sigma^2)$. Each fit is the pooled baseline~\eqref{eq:logit} on simulated January data (\nGamesJan{} games). Under classical error at $\sigma = 50$ the fitted edge is \simClassEdgePtsFifty{} rating points against a true \simTrueEdgePts{}, but \simClassEdgePPFifty{} points of score against \simTruePP{} (\simClassEdgePPErr\% off); under Berkson error the rating-point edge is unchanged and the score edge falls (Table~\ref{tab:sim}). The $\sigma$ at which the mean fitted slope ratio crosses the observed value is found by linear interpolation; the interval is the crossing for the ends of the observed slope's 95\% player-level interval.
+
+\begin{table}[h]
+  \centering
+  \caption{Simulated fitted slope ratio and fitted White's edge (percentage points of expected score; rating points) against per-player noise $\sigma$, means over 20 seeds. The true edge is \simTruePP{} points of score, \simTrueEdgePts{} rating points; ``--'' where the construction needs more noise than the gap variance allows.}
+  \label{tab:sim}
+  \scriptsize
+  \resizebox{\textwidth}{!}{\input{table_sim.tex}}
+\end{table}
+
+\section{Bootstrap schemes}
+\label{app:boot}
+
+Table~\ref{tab:boot} gives the half-width of the 95\% interval for the headline quantities under the game, day and player schemes (2000 resamples for test-set quantities, 1000 for coefficients).
+
+\begin{table}[h]
+  \centering
+  \caption{Half-widths of 95\% bootstrap intervals under three resampling schemes, on the same data. Player resampling widens intervals by a factor of \ratioMin--\ratioMax{} relative to day resampling.}
+  \label{tab:boot}
+  \small
+  \input{table_boot.tex}
+\end{table}
+
+\end{document}
